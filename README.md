@@ -23,7 +23,8 @@ func main() {
 			<script>console.log("scripts are discarded")</script>
 		</html>`
 
-	hizer := htmlizer.New(html)
+	hizer := htmlizer.New()
+	hizer.Load(html)
 
 	fmt.Println(">> Struct:")
 	fmt.Println(hizer)

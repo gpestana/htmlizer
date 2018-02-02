@@ -16,7 +16,8 @@ func TestSimpleDOM(t *testing.T) {
     <script>console.log("scripts are discarded")</script>
   </html>`
 
-	hr := New(html)
+	hr := New()
+	hr.Load(html)
 
 	h1, _ := hr.GetValues("h1")
 	h2, _ := hr.GetValues("h2")

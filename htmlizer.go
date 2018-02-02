@@ -3,10 +3,9 @@ package htmlizer
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/net/html"
 	"strings"
 )
-
-// Valid tags that HTMLizer deals with
 
 type Tag struct {
 	Type  string
@@ -17,13 +16,39 @@ type Htmlizer struct {
 	Tags []*Tag
 }
 
-func New(html string) Htmlizer {
+func New() Htmlizer {
 	return Htmlizer{}
+}
+
+func (h *Htmlizer) Load(s string) error {
+	r := strings.NewReader(s)
+	tz := html.NewTokenizer(r)
+	parsingValid := false
+	for {
+		tok := tz.Next()
+		switch {
+		case tok == html.ErrorToken:
+			return nil
+		case tok == html.StartTagToken && !parsingValid:
+			t := tz.Token()
+			if validTag(t.String()) {
+				parsingValid = true
+				fmt.Println("Opening Valid ", t.String())
+			}
+		case tok == html.EndTagToken && parsingValid:
+			t := tz.Token()
+			if validTag(t.String()) {
+				parsingValid = false
+				fmt.Println("Closing Valid ", t.String())
+			}
+		}
+	}
+	return nil
 }
 
 // Returns all values of `tagType`
 func (h *Htmlizer) GetValues(tagType string) ([]Tag, error) {
-	if valid := isTagValid(tagType); !valid {
+	if valid := validTag(tagType); !valid {
 		return nil, errors.New(fmt.Sprintf("Tag %v is not valid", tagType))
 	}
 	tags := []Tag{}
@@ -35,10 +60,15 @@ func (h *Htmlizer) GetValues(tagType string) ([]Tag, error) {
 	return tags, nil
 }
 
-func isTagValid(tag string) bool {
-	tagTypes := map[string]int{"a": 1, "p": 2, "h1": 3, "h2": 4, "h3": 5, "h4": 6, "h5": 7, "h6": 8}
-	_, ok := tagTypes[tag]
-	return ok
+func validTag(tag string) bool {
+	tagTypes := []string{
+		"<a>", "<p>", "<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>"}
+	for _, t := range tagTypes {
+		if t == tag {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *Htmlizer) HumanReadable() string {
