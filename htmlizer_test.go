@@ -19,9 +19,9 @@ func TestSimpleDOM(t *testing.T) {
 	hr := New()
 	hr.Load(html)
 
-	h1, _ := hr.GetValues("h1")
-	h2, _ := hr.GetValues("h2")
-	p, _ := hr.GetValues("p")
+	h1, _ := hr.GetValues("<h1>")
+	h2, _ := hr.GetValues("<h2>")
+	p, _ := hr.GetValues("<p>")
 	readable := hr.HumanReadable()
 
 	expectedH1 := "Heading H1"
@@ -52,12 +52,11 @@ func TestSimpleDOM(t *testing.T) {
 		t.Error(fmt.Sprintf("Second P content should be %v', found %v", expectedSecondP, secondP))
 	}
 
-	expectedHR := `
-Heading H1
+	expectedHR := `Heading H1
 This is the first text
 heading h2
-This is the second text
-`
+This is the second text`
+
 	if readable != expectedHR {
 		t.Error(fmt.Sprintf("Human Readable output should be %v, found", expectedHR, readable))
 	}

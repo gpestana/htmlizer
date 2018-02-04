@@ -13,7 +13,7 @@ type Tag struct {
 }
 
 type Htmlizer struct {
-	Tags []*Tag
+	Tags []Tag
 }
 
 func New() Htmlizer {
@@ -21,9 +21,11 @@ func New() Htmlizer {
 }
 
 func (h *Htmlizer) Load(s string) error {
+	parsingValid := false
+	currentTag := ""
+
 	r := strings.NewReader(s)
 	tz := html.NewTokenizer(r)
-	parsingValid := false
 	for {
 		tok := tz.Next()
 		switch {
@@ -33,13 +35,20 @@ func (h *Htmlizer) Load(s string) error {
 			t := tz.Token()
 			if validTag(t.String()) {
 				parsingValid = true
-				fmt.Println("Opening Valid ", t.String())
+				currentTag = t.String()
 			}
 		case tok == html.EndTagToken && parsingValid:
 			t := tz.Token()
 			if validTag(t.String()) {
 				parsingValid = false
-				fmt.Println("Closing Valid ", t.String())
+				currentTag = ""
+			}
+		default:
+			if parsingValid {
+				val := string(tz.Text())
+				tag := Tag{currentTag, val}
+				tags := append(h.Tags, tag)
+				h.Tags = tags
 			}
 		}
 	}
@@ -54,7 +63,7 @@ func (h *Htmlizer) GetValues(tagType string) ([]Tag, error) {
 	tags := []Tag{}
 	for _, t := range h.Tags {
 		if t.Type == tagType {
-			tags = append(tags, *t)
+			tags = append(tags, t)
 		}
 	}
 	return tags, nil
@@ -62,7 +71,8 @@ func (h *Htmlizer) GetValues(tagType string) ([]Tag, error) {
 
 func validTag(tag string) bool {
 	tagTypes := []string{
-		"<a>", "<p>", "<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>"}
+		"<a>", "<p>", "<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>",
+		"</a>", "</p>", "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>"}
 	for _, t := range tagTypes {
 		if t == tag {
 			return true
