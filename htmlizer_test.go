@@ -59,7 +59,7 @@ heading h2
 This is the second text`
 
 	if readable != expectedHR {
-		t.Error(fmt.Sprintf("Human Readable output should be %v, found", expectedHR, readable))
+		t.Error(fmt.Sprintf("Human Readable output should be %v, found %v", expectedHR, readable))
 	}
 }
 

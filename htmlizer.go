@@ -24,7 +24,7 @@ type Htmlizer struct {
 
 func New(ignore []rune) (Htmlizer, error) {
 	for r, _ := range ignore {
-		if r != tab || r != newLine {
+		if r != tab && r != newLine {
 			return Htmlizer{}, errors.New(fmt.Sprintf("%v is not a valid char to ignore", r))
 		}
 	}
@@ -64,7 +64,6 @@ func (h *Htmlizer) Load(s string) error {
 			}
 		}
 	}
-	return nil
 }
 
 // Returns all values of `tagType`
