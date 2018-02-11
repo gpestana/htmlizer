@@ -7,17 +7,28 @@ import (
 	"strings"
 )
 
+const (
+	tab     = '\t'
+	newLine = '\n'
+)
+
 type Tag struct {
 	Type  string
 	Value string
 }
 
 type Htmlizer struct {
-	Tags []Tag
+	Tags   []Tag
+	ignore []rune
 }
 
-func New() Htmlizer {
-	return Htmlizer{}
+func New(ignore []rune) (Htmlizer, error) {
+	for r, _ := range ignore {
+		if r != tab || r != newLine {
+			return Htmlizer{}, errors.New(fmt.Sprintf("%v is not a valid char to ignore", r))
+		}
+	}
+	return Htmlizer{}, nil
 }
 
 func (h *Htmlizer) Load(s string) error {
@@ -45,7 +56,8 @@ func (h *Htmlizer) Load(s string) error {
 			}
 		default:
 			if parsingValid {
-				val := string(tz.Text())
+				rawVal := string(tz.Text())
+				val := dropRunes(rawVal, h.ignore)
 				tag := Tag{currentTag, val}
 				tags := append(h.Tags, tag)
 				h.Tags = tags
@@ -79,6 +91,23 @@ func validTag(tag string) bool {
 		}
 	}
 	return false
+}
+
+func dropRunes(s string, rsIgn []rune) string {
+	dropIgnored := func(r rune) rune {
+		ignore := false
+		for _, rIgn := range rsIgn {
+			if rIgn == r {
+				ignore = true
+				break
+			}
+		}
+		if ignore {
+			return -1
+		}
+		return r
+	}
+	return strings.Map(dropIgnored, s)
 }
 
 func (h *Htmlizer) HumanReadable() string {
