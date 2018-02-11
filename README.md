@@ -49,9 +49,6 @@ heading h2
 This is the second text
 ```
 
-
-```
-
 ### Contribute
 
 Fork and PR and use issues for bug reports, feature requests and general comments.
