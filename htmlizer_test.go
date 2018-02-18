@@ -63,29 +63,29 @@ This is the second text`
 	}
 }
 
-/*
 func TestSpecialChars(t *testing.T) {
 	html := `<html>
   	<body>
       <p>testing the ignores now...
-followed by this			<-- this are a tabs
+followed by this			<-- this are tabs
+
 How about this?</p>
     </body>
   </html>`
 
 	ignore := []rune{'\t', '\n'}
-	hr, _ := New(ignore)
+	hr, err := New(ignore)
+	if err != nil {
+		t.Fatal(err)
+	}
 	hr.Load(html)
-	expectedHR := `testing the ignores now...
-followed by this <-- this are tabs
-How about this?
-`
+	expectedHR := `testing the ignores now... followed by this   <-- this are tabs  How about this?`
 	p, _ := hr.GetValues("<p>")
 	if actual := p[0].Value; actual != expectedHR {
-		t.Error(fmt.Sprintf("Human readable should be: \n%v \nfound:\n %v", expectedHR, actual))
+		t.Error(fmt.Sprintf("\n>>Human readable should be:\n%v \n>>found:\n%v", expectedHR, actual))
 	}
 }
-*/
+
 func testDropRunes(t *testing.T) {
 	str := "This \n is \t a big mess \n \n"
 
