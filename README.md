@@ -25,8 +25,8 @@ func main() {
      <script>console.log("scripts are discarded")</script>
    </html>`
 
-	// will trim out all the tabs from text
-	ignore := []rune{'\t'}
+  // will trim out all the tabs from text
+  ignore := []rune{'\t'}
   hizer := htmlizer.New(ignore)
   hizer.Load(html)
 
